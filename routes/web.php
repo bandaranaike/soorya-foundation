@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\TechnicalCollege\JapanLanguageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,7 +24,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 
 Route::middleware([
     'auth:sanctum',
@@ -32,4 +34,13 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+});
+
+Route::get('donate', fn() => Inertia::render('DonationPage'))->name('donate');
+Route::post("checkout-paypal", [PayPalController::class, "createPayment"]);
+Route::post("execute-paypal", [PayPalController::class, "executePaypal"]);
+
+Route::group(["prefix" => "technical-college"], function () {
+    Route::get('japanese-training-form', [JapanLanguageController::class, "showRegistrationForm"]);
+    Route::post('japanese-training-form', [JapanLanguageController::class, "saveApplication"])->name('tc.japanese.form');
 });
